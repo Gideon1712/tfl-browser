@@ -1,10 +1,10 @@
-﻿import json, time
+import json, time
 from flask import Flask, jsonify, request
 from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
 
 app = Flask(__name__)
-with open("stations.json","r",encoding="utf-8") as f: STATIONS=json.load(f)
-with open("lines.json","r",encoding="utf-8") as f: LINES=json.load(f)
+with open("stations.json","r",encoding="utf-8-sig") as f: STATIONS=json.load(f)
+with open("lines.json","r",encoding="utf-8-sig") as f: LINES=json.load(f)
 
 REQ_COUNT = Counter("http_requests_total","Total HTTP requests",["endpoint","method","code"])
 REQ_LAT   = Histogram("http_request_duration_seconds","Latency",["endpoint","method"])

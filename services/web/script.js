@@ -1,4 +1,4 @@
-﻿async function loadStations(){
+async function loadStations(){
   const q=document.getElementById("q").value.trim();
   const url=q?`/api/stations?q=${encodeURIComponent(q)}`:"/api/stations";
   const res=await fetch(url); const data=await res.json();
