@@ -21,21 +21,25 @@ def _after(resp):
     return resp
 
 @app.get("/healthz")
+@app.get("/api/healthz")
 def healthz(): return {"status":"ok"},200
 
 @app.get("/metrics")
 def metrics(): return generate_latest(),200,{"Content-Type":CONTENT_TYPE_LATEST}
 
 @app.get("/stations")
+@app.get("/api/stations")
 def stations():
     q=request.args.get("q")
     if not q: return jsonify(STATIONS)
     ql=q.lower(); return jsonify([s for s in STATIONS if ql in s["name"].lower()])
 
 @app.get("/lines")
+@app.get("/api/lines")
 def lines(): return jsonify(LINES)
 
 @app.get("/journey-mock")
+@app.get("/api/journey-mock")
 def journey():
     src=request.args.get("from"); dst=request.args.get("to")
     if not src or not dst: return {"error":"from and to are required"},400
