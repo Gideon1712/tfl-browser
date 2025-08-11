@@ -1,33 +1,34 @@
 ﻿name: ci-cd
 on:
-  push: { branches: [ main ] }
+  push:
+    branches: [ main ]
   workflow_dispatch: {}
+
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions: { contents: read, packages: write }
+    permissions:
+      contents: read
+      packages: write
+    env:
+      OWNER_LC: ${{ toLower(github.repository_owner) }}
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v3
       - uses: docker/setup-buildx-action@v3
-
-      # 👇 compute lowercased owner for ghcr paths
-      - name: Lowercase owner
-        run: echo "OWNER_LC=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
-
       - uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
-      - uses: docker/build-push-action@v5
+      - name: Build & push API
+        uses: docker/build-push-action@v5
         with:
           context: ./services/api
           push: true
           tags: ghcr.io/${{ env.OWNER_LC }}/tfl-api:${{ github.sha }}
-
-      - uses: docker/build-push-action@v5
+      - name: Build & push Web
+        uses: docker/build-push-action@v5
         with:
           context: ./services/web
           push: true
@@ -37,16 +38,16 @@ jobs:
     needs: build
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    env:
+      OWNER_LC: ${{ toLower(github.repository_owner) }}
     steps:
       - uses: actions/checkout@v4
-
-      # 👇 compute the same lowercased owner for helm image repos
-      - name: Lowercase owner
-        run: echo "OWNER_LC=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
-
-      - uses: azure/login@v2
-        with: { creds: ${{ secrets.AZURE_CREDENTIALS }} }
-      - uses: azure/aks-set-context@v4
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Set AKS context
+        uses: azure/aks-set-context@v4
         with:
           resource-group: ${{ secrets.AKS_RG }}
           cluster-name:  ${{ secrets.AKS_NAME }}
@@ -54,7 +55,7 @@ jobs:
       - name: Helm upgrade
         run: |
           helm upgrade --install tfl ./charts/tfl \
-            --set api.image.repository=ghcr.io/${{ env.OWNER_LC }}/tfl-api \
+            --set api.image.repository=ghcr.io/${OWNER_LC}/tfl-api \
             --set api.image.tag=${{ github.sha }} \
-            --set web.image.repository=ghcr.io/${{ env.OWNER_LC }}/tfl-web \
+            --set web.image.repository=ghcr.io/${OWNER_LC}/tfl-web \
             --set web.image.tag=${{ github.sha }}
