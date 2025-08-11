@@ -10,23 +10,28 @@ jobs:
     permissions:
       contents: read
       packages: write
-    env:
-      OWNER_LC: ${{ toLower(github.repository_owner) }}
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v3
       - uses: docker/setup-buildx-action@v3
+
+      # 👇 create OWNER_LC and export to $GITHUB_ENV
+      - name: Lowercase owner
+        run: echo "OWNER_LC=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
       - uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Build & push API
         uses: docker/build-push-action@v5
         with:
           context: ./services/api
           push: true
           tags: ghcr.io/${{ env.OWNER_LC }}/tfl-api:${{ github.sha }}
+
       - name: Build & push Web
         uses: docker/build-push-action@v5
         with:
@@ -38,20 +43,26 @@ jobs:
     needs: build
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    env:
-      OWNER_LC: ${{ toLower(github.repository_owner) }}
     steps:
       - uses: actions/checkout@v4
+
+      # 👇 same lowercase var for deploy job
+      - name: Lowercase owner
+        run: echo "OWNER_LC=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
       - name: Azure login
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
+
       - name: Set AKS context
         uses: azure/aks-set-context@v4
         with:
           resource-group: ${{ secrets.AKS_RG }}
           cluster-name:  ${{ secrets.AKS_NAME }}
+
       - uses: azure/setup-helm@v4
+
       - name: Helm upgrade
         run: |
           helm upgrade --install tfl ./charts/tfl \
