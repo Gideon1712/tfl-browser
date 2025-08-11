@@ -1,0 +1,18 @@
+﻿api:
+  image:
+    repository: ghcr.io/Gideon1712/tfl-api
+    tag: "dev"
+  replicaCount: 1
+  port: 8000
+
+web:
+  image:
+    repository: ghcr.io/Gideon1712/tfl-web
+    tag: "dev"
+  replicaCount: 1
+  port: 8080
+
+ingress:
+  enabled: true
+  className: nginx
+  host: ""

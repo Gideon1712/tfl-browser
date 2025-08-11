@@ -1,0 +1,24 @@
+﻿# General
+*.log
+*.tmp
+*.swp
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Node/Web builds (if you add a build step later)
+dist/
+build/
+
+# Terraform
+.terraform/
+.terraform.lock.hcl
+terraform.tfstate
+terraform.tfstate.backup
+*.tfvars
+
+# Docker
+*.env
+ sp-aks.json

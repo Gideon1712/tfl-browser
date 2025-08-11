@@ -1,0 +1,25 @@
+﻿apiVersion: apps/v1
+kind: Deployment
+metadata: { name: tfl-web }
+spec:
+  replicas: {{ .Values.web.replicaCount }}
+  selector: { matchLabels: { app: tfl-web } }
+  template:
+    metadata: { labels: { app: tfl-web } }
+    spec:
+      securityContext: { runAsNonRoot: true, runAsUser: 101 }
+      containers:
+      - name: web
+        image: "{{ .Values.web.image.repository }}:{{ .Values.web.image.tag }}"
+        imagePullPolicy: IfNotPresent
+        ports: [ { containerPort: {{ .Values.web.port }} } ]
+        readinessProbe: { httpGet: { path: /, port: {{ .Values.web.port }} }, initialDelaySeconds: 3 }
+        livenessProbe:  { httpGet: { path: /, port: {{ .Values.web.port }} }, initialDelaySeconds: 10 }
+        resources: { requests: { cpu: "50m", memory: "64Mi" } }
+---
+apiVersion: v1
+kind: Service
+metadata: { name: tfl-web }
+spec:
+  selector: { app: tfl-web }
+  ports: [ { name: http, port: 80, targetPort: {{ .Values.web.port }} } ]

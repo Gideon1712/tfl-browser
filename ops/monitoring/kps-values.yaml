@@ -1,0 +1,32 @@
+﻿grafana:
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+
+prometheusOperator:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+
+prometheus:
+  prometheusSpec:
+    retention: 12h
+    scrapeInterval: 30s
+    evaluationInterval: 30s
+    resources:
+      requests:
+        cpu: 200m
+        memory: 512Mi
+
+# Reduce components AKS nodes can't scrape anyway
+kubeEtcd:
+  enabled: false
+kubeControllerManager:
+  enabled: false
+kubeScheduler:
+  enabled: false
+
+alertmanager:
+  enabled: false  # optional: disable to reduce footprint further

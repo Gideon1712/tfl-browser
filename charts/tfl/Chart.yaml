@@ -1,0 +1,5 @@
+﻿apiVersion: v2
+name: tfl
+version: 0.1.0
+description: TfL Station Browser (web + api)
+type: application
