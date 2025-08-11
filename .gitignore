@@ -1,4 +1,4 @@
-﻿# General
+# General
 *.log
 *.tmp
 *.swp
@@ -21,4 +21,6 @@ terraform.tfstate.backup
 
 # Docker
 *.env
- sp-aks.json
+*.tfplan
+sp-aks.json
+*.tfplan
