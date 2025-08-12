@@ -1,0 +1,7 @@
+[
+  {"name":"Bank","line":["Central","Northern"],"zone":1},
+  {"name":"Waterloo","line":["Jubilee","Northern","Bakerloo"],"zone":1},
+  {"name":"Green Park","line":["Jubilee","Piccadilly","Victoria"],"zone":1},
+  {"name":"Oxford Circus","line":["Bakerloo","Central","Victoria"],"zone":1},
+  {"name":"Victoria","line":["District","Circle","Victoria"],"zone":1}
+]
