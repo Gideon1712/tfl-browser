@@ -24,3 +24,5 @@ terraform.tfstate.backup
 *.tfplan
 sp-aks.json
 *.tfplan
+
+infra/terraform/*.tfplan
